@@ -17,6 +17,7 @@
     AVCaptureDeviceInput *_deviceInput;
     AVCaptureVideoDataOutput *_videoDataOutput;
     dispatch_queue_t _videoOutQueue;
+    int _exifOrientation;
     
     //  UI
     UIImageView *_preview;
@@ -28,10 +29,21 @@
     NSTimer *_updateTimer;
     
     //  Data
-    UIImageOrientation _imageOrientation;
+//    UIImageOrientation _imageOrientation;
 }
 
 @end
+
+enum {
+    PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
+    PHOTOS_EXIF_0ROW_TOP_0COL_RIGHT			= 2, //   2  =  0th row is at the top, and 0th column is on the right.
+    PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT      = 3, //   3  =  0th row is at the bottom, and 0th column is on the right.
+    PHOTOS_EXIF_0ROW_BOTTOM_0COL_LEFT       = 4, //   4  =  0th row is at the bottom, and 0th column is on the left.
+    PHOTOS_EXIF_0ROW_LEFT_0COL_TOP          = 5, //   5  =  0th row is on the left, and 0th column is the top.
+    PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP         = 6, //   6  =  0th row is on the right, and 0th column is the top.
+    PHOTOS_EXIF_0ROW_RIGHT_0COL_BOTTOM      = 7, //   7  =  0th row is on the right, and 0th column is the bottom.
+    PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM       = 8  //   8  =  0th row is on the left, and 0th column is the bottom.
+};
 
 @implementation FRCaptureView
 
@@ -49,7 +61,7 @@
 }
 
 - (void)_prepareData {
-    _imageOrientation = UIImageOrientationRight;
+//    _imageOrientation = UIImageOrientationRight;
 }
 
 - (void)_prepareSession {
@@ -117,26 +129,27 @@
 #pragma mark - Face Recognition
 
 - (void)_faceRecognition {
-    
-    NSDictionary *options = @{
-                              CIDetectorImageOrientation : [NSNumber numberWithInt:_imageOrientation]
-                              };
-    
-    CIImage *faceImage = [CIImage imageWithCGImage:_preview.image.CGImage];
+    CIImage *faceImage = [CIImage imageWithCGImage:_preview.image.CGImage options:@{
+//                                                                                    CIDetectorImageOrientation : [NSNumber numberWithInt:_exifOrientation]
+                                                                                    }];
     
     CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
                                               context:nil
                                               options:@{
                                                         CIDetectorAccuracy : CIDetectorAccuracyLow,
                                                         }];
-    NSArray *faceFeatures = [detector featuresInImage:faceImage options:options];
+    NSArray *faceFeatures = [detector featuresInImage:faceImage options:@{
+                                                                          CIDetectorImageOrientation : [NSNumber numberWithInt:_exifOrientation]
+                                                                          }];
+    
     for (CIFaceFeature *feature in faceFeatures) {
-        NSLog(@"feature = left Eye %@ right Eye %@ mouth %@", NSStringFromCGPoint(feature.leftEyePosition),
+        NSLog(@"left Eye %@ right Eye %@ mouth %@", NSStringFromCGPoint(feature.leftEyePosition),
               NSStringFromCGPoint(feature.rightEyePosition),
               NSStringFromCGPoint(feature.mouthPosition));
-        _leftEyeView.frame = CGRectMake(feature.leftEyePosition.x, feature.leftEyePosition.y, 10, 10);
-        _rightEyeView.frame = CGRectMake(feature.rightEyePosition.x, feature.rightEyePosition.y, 10, 10);
-        _mouthView.frame = CGRectMake(feature.mouthPosition.x, feature.mouthPosition.y, 30, 10);
+        
+        _leftEyeView.frame = CGRectMake(feature.leftEyePosition.y, feature.leftEyePosition.x, 10, 10);
+        _rightEyeView.frame = CGRectMake(feature.rightEyePosition.y, feature.rightEyePosition.x, 10, 10);
+        _mouthView.frame = CGRectMake(feature.mouthPosition.y, feature.mouthPosition.x, 30, 10);
     }
 
     _thumbnailImageView.image = [UIImage imageWithCIImage:faceImage];
@@ -164,8 +177,41 @@
                                                    kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     
     CGImageRef cgImage = CGBitmapContextCreateImage(cgContext);
+
+    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+
+    BOOL isUsingFrontFacingCamera = FALSE;
+    AVCaptureDevicePosition currentCameraPosition = AVCaptureDevicePositionFront;
     
-    UIImage *image = [UIImage imageWithCGImage:cgImage scale:1 orientation:_imageOrientation];
+    if (currentCameraPosition != AVCaptureDevicePositionBack)
+    {
+        isUsingFrontFacingCamera = TRUE;
+    }
+    
+    switch (deviceOrientation) {
+        case UIDeviceOrientationPortraitUpsideDown:  // Device oriented vertically, home button on the top
+            _exifOrientation = PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM;
+            break;
+        case UIDeviceOrientationLandscapeLeft:       // Device oriented horizontally, home button on the right
+            if (isUsingFrontFacingCamera)
+                _exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
+            else
+                _exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
+            break;
+        case UIDeviceOrientationLandscapeRight:      // Device oriented horizontally, home button on the left
+            if (isUsingFrontFacingCamera)
+                _exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
+            else
+                _exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
+            break;
+        case UIDeviceOrientationPortrait:            // Device oriented vertically, home button on the bottom
+        default:
+            _exifOrientation = PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP;
+            break;
+    }
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:1 orientation:_exifOrientation];
+
     CGColorSpaceRelease(colorSpace);
     CGImageRelease(cgImage);
     CGContextRelease(cgContext);

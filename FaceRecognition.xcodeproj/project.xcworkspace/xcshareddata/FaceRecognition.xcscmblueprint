@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "4D0FDFED470FA6AEACB0BEA33BA1AFBB1FF602DC",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "4D0FDFED470FA6AEACB0BEA33BA1AFBB1FF602DC" : 0,
+    "DB328B4CA328192361C6C488DBFE61BCE85C21A9" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B6639F66-A425-4894-ADAE-D7FCC4EC7436",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "4D0FDFED470FA6AEACB0BEA33BA1AFBB1FF602DC" : "FaceRecognition\/",
+    "DB328B4CA328192361C6C488DBFE61BCE85C21A9" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "FaceRecognition",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "FaceRecognition.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/guoyi427\/FaceRecognition.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "4D0FDFED470FA6AEACB0BEA33BA1AFBB1FF602DC"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/guoyi427\/FirstAttention.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DB328B4CA328192361C6C488DBFE61BCE85C21A9"
+    }
+  ]
+}
