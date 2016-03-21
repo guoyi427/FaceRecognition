@@ -244,6 +244,7 @@
 				TargetAttributes = {
 					2898764E1C9934C700303045 = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = QEJW2BZ99E;
 					};
 					289876671C9934C700303045 = {
 						CreatedOnToolsVersion = 7.2;
@@ -451,6 +452,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = FaceRecognition/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.guoyi.FaceRecognition;
@@ -462,6 +464,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = FaceRecognition/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.guoyi.FaceRecognition;
@@ -536,6 +539,7 @@
 				2898767E1C9934C700303045 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2898767F1C9934C700303045 /* Build configuration list for PBXNativeTarget "FaceRecognitionTests" */ = {
 			isa = XCConfigurationList;
@@ -544,6 +548,7 @@
 				289876811C9934C700303045 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		289876821C9934C700303045 /* Build configuration list for PBXNativeTarget "FaceRecognitionUITests" */ = {
 			isa = XCConfigurationList;
@@ -552,6 +557,7 @@
 				289876841C9934C700303045 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

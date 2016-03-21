@@ -23,8 +23,12 @@
     UIView *_leftEyeView;
     UIView *_rightEyeView;
     UIView *_mouthView;
+    UIImageView *_thumbnailImageView;
     
     NSTimer *_updateTimer;
+    
+    //  Data
+    UIImageOrientation _imageOrientation;
 }
 
 @end
@@ -36,11 +40,16 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor magentaColor];
+        [self _prepareData];
         [self _prepareSession];
         [self _preparePreView];
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_faceRecognition) userInfo:nil repeats:YES];
     }
     return self;
+}
+
+- (void)_prepareData {
+    _imageOrientation = UIImageOrientationRight;
 }
 
 - (void)_prepareSession {
@@ -84,6 +93,7 @@
 
 - (void)_preparePreView {
     _preview = [[UIImageView alloc] initWithFrame:self.bounds];
+    _preview.contentMode = UIViewContentModeScaleAspectFit;
     [self addSubview:_preview];
     
     _leftEyeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
@@ -97,30 +107,39 @@
     _mouthView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 10)];
     _mouthView.backgroundColor = [UIColor blueColor];
     [self addSubview:_mouthView];
+    
+    _thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.frame) - 100, 100, 100)];
+    _thumbnailImageView.contentMode = UIViewContentModeScaleAspectFit;
+    _thumbnailImageView.backgroundColor = [UIColor blackColor];
+    [_preview addSubview:_thumbnailImageView];
 }
 
 #pragma mark - Face Recognition
 
 - (void)_faceRecognition {
     
+    NSDictionary *options = @{
+                              CIDetectorImageOrientation : [NSNumber numberWithInt:_imageOrientation]
+                              };
+    
     CIImage *faceImage = [CIImage imageWithCGImage:_preview.image.CGImage];
     
     CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
                                               context:nil
                                               options:@{
-                                                        CIDetectorAccuracy : CIDetectorAccuracyLow
+                                                        CIDetectorAccuracy : CIDetectorAccuracyLow,
                                                         }];
-    NSArray *faceFeatures = [detector featuresInImage:faceImage options:@{
-                                                                          CIDetectorImageOrientation : [NSNumber numberWithInt:UIImageOrientationDownMirrored]
-                                                                          }];
+    NSArray *faceFeatures = [detector featuresInImage:faceImage options:options];
     for (CIFaceFeature *feature in faceFeatures) {
         NSLog(@"feature = left Eye %@ right Eye %@ mouth %@", NSStringFromCGPoint(feature.leftEyePosition),
               NSStringFromCGPoint(feature.rightEyePosition),
               NSStringFromCGPoint(feature.mouthPosition));
-        _leftEyeView.frame = CGRectMake(feature.leftEyePosition.x - 320, feature.leftEyePosition.y, 10, 10);
-        _rightEyeView.frame = CGRectMake(feature.rightEyePosition.x - 320, feature.rightEyePosition.y, 10, 10);
-        _mouthView.frame = CGRectMake(feature.mouthPosition.x - 320, feature.mouthPosition.y, 30, 10);
+        _leftEyeView.frame = CGRectMake(feature.leftEyePosition.x, feature.leftEyePosition.y, 10, 10);
+        _rightEyeView.frame = CGRectMake(feature.rightEyePosition.x, feature.rightEyePosition.y, 10, 10);
+        _mouthView.frame = CGRectMake(feature.mouthPosition.x, feature.mouthPosition.y, 30, 10);
     }
+
+    _thumbnailImageView.image = [UIImage imageWithCIImage:faceImage];
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBuffer - Delegate
@@ -146,7 +165,7 @@
     
     CGImageRef cgImage = CGBitmapContextCreateImage(cgContext);
     
-    UIImage *image = [UIImage imageWithCGImage:cgImage scale:1 orientation:UIImageOrientationRight];
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:1 orientation:_imageOrientation];
     CGColorSpaceRelease(colorSpace);
     CGImageRelease(cgImage);
     CGContextRelease(cgContext);
